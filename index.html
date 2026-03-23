@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 Best of STEM Awards — Entry & Pricing</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --cx-teal: #15435a;
+  --cx-blue: #2abae5;
+  --cx-raspberry: #d82356;
+  --cx-teal-light: #e8f2f6;
+  --bg: #ffffff;
+  --bg-secondary: #f5f5f3;
+  --text: #1a1a1a;
+  --text-secondary: #6b6b6b;
+  --border: rgba(0,0,0,0.12);
+  --border-secondary: rgba(0,0,0,0.22);
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+body { font-family: 'Montserrat', sans-serif; background: var(--bg-secondary); color: var(--text); min-height: 100vh; }
+.page { max-width: 820px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+.header-bar { background: var(--cx-teal); border-radius: var(--radius-lg); padding: 1.5rem 1.75rem; margin-bottom: 1.5rem; }
+.header-bar h1 { font-size: 18px; font-weight: 600; color: white; margin-bottom: 4px; }
+.header-bar .tagline { font-size: 13px; color: rgba(255,255,255,0.75); }
+.tier-legend { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.tier-pill { font-size: 12px; padding: 5px 12px; border-radius: 99px; border: 1px solid; font-weight: 500; }
+.tier-pill.t1 { background: var(--cx-teal-light); border-color: var(--cx-blue); color: var(--cx-teal); }
+.tier-pill.t2 { background: #e8f6e8; border-color: #1d9e75; color: #085041; }
+.tier-pill.t3 { background: #fef3e2; border-color: #ba7517; color: #633806; }
+.sticky-total { position: sticky; top: 0; z-index: 10; background: var(--bg-secondary); padding: 0.75rem 0; margin-bottom: 1.5rem; }
+.total-bar { background: var(--cx-teal-light); border: 1px solid var(--cx-blue); border-radius: var(--radius-md); padding: 0.85rem 1.25rem; display: flex; justify-content: space-between; align-items: center; }
+.total-label { font-size: 13px; color: var(--cx-teal); font-weight: 600; }
+.total-amount { font-size: 24px; font-weight: 600; color: var(--cx-teal); }
+.total-breakdown { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.product-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 1.25rem; overflow: hidden; }
+.product-header { background: var(--cx-teal); padding: 0.85rem 1.25rem; display: flex; justify-content: space-between; align-items: center; }
+.product-header span { color: white; font-size: 14px; font-weight: 500; }
+.remove-btn { background: none; border: 1px solid rgba(255,255,255,0.4); color: white; border-radius: var(--radius-md); padding: 4px 12px; font-size: 12px; cursor: pointer; }
+.remove-btn:hover { background: rgba(255,255,255,0.15); }
+.product-body { padding: 1.5rem; }
+.field { margin-bottom: 1.25rem; }
+.field label { display: block; font-size: 11px; color: var(--text-secondary); margin-bottom: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.field input[type="text"] { width: 100%; padding: 8px 12px; border: 1px solid var(--border-secondary); border-radius: var(--radius-md); font-size: 14px; font-family: 'Montserrat', sans-serif; outline: none; background: white; color: var(--text); }
+.field input[type="text"]:focus { border-color: var(--cx-blue); box-shadow: 0 0 0 3px rgba(42,186,229,0.15); }
+.cat-groups { margin-top: 0.5rem; }
+.cat-group { margin-bottom: 1.25rem; }
+.cat-group-label { font-size: 11px; font-weight: 600; color: var(--cx-blue); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid var(--border); }
+.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 4px; }
+.cat-item { display: flex; align-items: flex-start; gap: 8px; padding: 6px 8px; border-radius: var(--radius-md); cursor: pointer; border: 1px solid transparent; transition: all 0.1s; }
+.cat-item:hover { background: var(--cx-teal-light); }
+.cat-item.selected { background: var(--cx-teal-light); border-color: var(--cx-blue); }
+.cat-item input[type="checkbox"] { margin-top: 2px; cursor: pointer; flex-shrink: 0; accent-color: var(--cx-teal); width: 14px; height: 14px; }
+.cat-item label { font-size: 12px; line-height: 1.45; cursor: pointer; color: var(--text); }
+.product-subtotal { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.product-subtotal .cat-count { font-size: 13px; color: var(--text-secondary); }
+.product-subtotal .sub-amount { font-size: 16px; font-weight: 600; color: var(--cx-teal); }
+.add-product-btn { width: 100%; border: 2px dashed var(--cx-blue); background: none; border-radius: var(--radius-lg); padding: 1rem; font-size: 13px; color: var(--cx-blue); cursor: pointer; font-weight: 600; font-family: 'Montserrat', sans-serif; margin-bottom: 1.5rem; }
+.add-product-btn:hover { background: var(--cx-teal-light); }
+.discount-section { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.5rem; }
+.discount-section .section-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px; }
+.discount-hint { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.5; }
+.discount-hint strong { color: var(--cx-teal); }
+.discount-rows { display: flex; flex-direction: column; gap: 8px; }
+.discount-row { display: flex; gap: 8px; align-items: center; }
+.discount-row input { flex: 1; padding: 8px 12px; border: 1px solid var(--border-secondary); border-radius: var(--radius-md); font-size: 14px; font-family: 'Montserrat', sans-serif; outline: none; background: white; color: var(--text); }
+.discount-row input:focus { border-color: var(--cx-blue); box-shadow: 0 0 0 3px rgba(42,186,229,0.15); }
+.apply-btn { background: var(--cx-teal); color: white; border: none; border-radius: var(--radius-md); padding: 0 18px; height: 38px; font-size: 13px; font-family: 'Montserrat', sans-serif; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.apply-btn:hover { background: #1a5470; }
+.add-code-link { font-size: 12px; color: var(--cx-blue); cursor: pointer; background: none; border: none; font-family: 'Montserrat', sans-serif; padding: 0; text-decoration: underline; }
+.discount-msg { font-size: 12px; margin-top: 6px; font-weight: 500; line-height: 1.5; }
+.discount-msg.success { color: #0f6e56; }
+.discount-msg.error { color: var(--cx-raspberry); }
+.discount-msg.warning { color: #ba7517; }
+.summary-section { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.5rem; }
+.summary-row { display: flex; justify-content: space-between; font-size: 14px; padding: 5px 0; }
+.summary-row.discount { color: #0f6e56; font-weight: 500; }
+.summary-row.total { font-size: 17px; font-weight: 600; padding-top: 12px; border-top: 1px solid var(--border); margin-top: 8px; }
+.checkout-btn { width: 100%; background: var(--cx-raspberry); color: white; border: none; border-radius: var(--radius-lg); padding: 1.1rem; font-size: 16px; font-weight: 600; cursor: pointer; font-family: 'Montserrat', sans-serif; transition: opacity 0.15s; }
+.checkout-btn:hover:not(:disabled) { opacity: 0.9; }
+.checkout-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.note { font-size: 12px; color: var(--text-secondary); text-align: center; margin-top: 10px; line-height: 1.6; }
+.deadline-badge { display: inline-block; background: #fef3e2; border: 1px solid #ba7517; color: #633806; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-md); margin-left: 6px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header-bar">
+    <h1>2026 Best of STEM Awards — Entry & Pricing</h1>
+    <div class="tagline">Select your categories, see your total, then pay to unlock the full application (pre-filled with your info)</div>
+  </div>
+
+  <div class="tier-legend">
+    <div class="tier-pill t1">1 entry: $745</div>
+    <div class="tier-pill t2">2–4 entries: $625 each</div>
+    <div class="tier-pill t3">5+ entries: $575 each</div>
+  </div>
+
+  <div class="sticky-total">
+    <div class="total-bar">
+      <div>
+        <div class="total-label">Running total</div>
+        <div class="total-breakdown" id="breakdown-text">No entries selected yet</div>
+      </div>
+      <div class="total-amount" id="total-display">$0</div>
+    </div>
+  </div>
+
+  <div id="products-container"></div>
+  <button class="add-product-btn" onclick="addProduct()">+ Add another product</button>
+
+  <div class="discount-section">
+    <span class="section-label">Discount or promo code</span>
+    <div class="discount-hint">Have the <strong>Earl E. Byrd early bird code?</strong> It can be combined with one additional code. <span class="deadline-badge">Expires May 5, 2026</span></div>
+    <div class="discount-rows">
+      <div class="discount-row">
+        <input type="text" id="code1" placeholder="First code" oninput="this.value=this.value.toUpperCase()">
+        <button class="apply-btn" onclick="applyCodes()">Apply</button>
+      </div>
+      <div class="discount-row" id="code2-row" style="display:none;">
+        <input type="text" id="code2" placeholder="Second code (optional)" oninput="this.value=this.value.toUpperCase()">
+      </div>
+      <button class="add-code-link" id="add-code-btn" onclick="showSecondCode()">+ Add a second code</button>
+    </div>
+    <div class="discount-msg" id="discount-msg"></div>
+  </div>
+
+  <div class="summary-section" id="summary-section" style="display:none;">
+    <div id="summary-rows"></div>
+  </div>
+
+  <button class="checkout-btn" id="checkout-btn" disabled>Enter a product name and select at least one category to continue</button>
+  <p class="note">After payment, you'll be redirected to the full application — your product name, company, and selected categories will be pre-filled.</p>
+</div>
+
+<script>
+const CATEGORIES = {
+  "AI Awards": ["AI for Personalized Learning at Scale","AI for Smarter Schools","AI in School Safety & Response","AI Teaching Assistant of the Year","AI Trailblazer Award","Best AI Literacy Solution","Best AI Innovation for Teaching & Learning"],
+  "Best of STEM: Subject Areas": ["Best of STEM for Biology","Best of STEM for Chemistry","Best of STEM for Data Collection & Analysis","Best of STEM for Engineering Education","Best of STEM for Environmental Science","Best of STEM for Mathematics","Best of STEM for Physics","Best of STEM for Space Science"],
+  "Best of STEM: Teaching & Learning": ["Best of STEM: Differentiated Instruction for Teaching & Learning","Best of STEM: Hands-on Learning","Best of STEM Curricular Materials: Pre-K to Grade 2","Best Digital Ecosystem for STEM Teachers","Best Hands-On Materials for OpenSciEd","Best Robotics for Teaching & Learning","Best Video-Based Learning"],
+  "Program & Innovation Awards": ["Best Customer Support","Best Entrepreneurship Program for Career & Technical Education (CTE)","Best Freebies","Best Innovation of 2026","Best Integration of Language Arts (STEAM)","Best Professional Development","Best Resources for Analyzing and Interpreting Data"],
+  "Bridging the Gap": ["Bridging the Gap: English Language Learners","Bridging the Gap: Math Intervention Resources","Bridging the Gap: Professional Development","Bridging the Gap: Tutoring Programs for STEM","Bridging the Gap: Webinar Series Exemplar"],
+  "CTE Champions": ["CTE Champion: International Impact","CTE Champion: Manufacturing","CTE Champions: Coding & Computer Science","CTE Champions: Comprehensive CTE Solutions","CTE Champions: Engineering","CTE Champions: Health Science","CTE Champions: Invention Education","CTE Champions: STEM"],
+  "Social Impact": ["Social Impact Award: Developing Citizen Scientists","Social Impact Award: Promoting Diversity & Equity Inclusion"],
+  "Trailblazer": ["Trailblazer: Biotechnology Innovator","Trailblazer: Early Learning (Pre-K-6)","Trailblazer: Hybrid Learning Superhero","Trailblazer: Immersive Reality (AR/VR)","Trailblazer: Inspiring Computational Thinking","Trailblazer: Middle School STEM—Grades 4-8","Trailblazer: Phenomena-Based Teaching and Learning","Trailblazer: Simulations for STEM","Trailblazer: Virtual Labs Luminary"]
+};
+
+const EARL_CODE = "EARLE.BYRD2026";
+const EARL_DEADLINE = new Date("2026-05-05T23:59:59");
+
+const CODES = {
+  "EARLE.BYRD2026": { amount: 100, isEarl: true },
+  "KEHLUV2026":     { amount: 100, isEarl: false },
+  "2026AWARDS":     { amount: 50,  isEarl: false }
+};
+
+let products = [];
+let discountTotal = 0;
+let productCounter = 0;
+let secondCodeVisible = false;
+
+function showSecondCode() {
+  document.getElementById('code2-row').style.display = 'flex';
+  document.getElementById('add-code-btn').style.display = 'none';
+  secondCodeVisible = true;
+}
+
+function applyCodes() {
+  const c1 = document.getElementById('code1').value.trim().toUpperCase();
+  const c2 = secondCodeVisible ? document.getElementById('code2').value.trim().toUpperCase() : '';
+  const msg = document.getElementById('discount-msg');
+  const now = new Date();
+
+  discountTotal = 0;
+  let messages = [];
+  let hasEarl = false;
+  let validCodes = [];
+
+  function validateCode(code) {
+    if (!code) return null;
+    const entry = CODES[code];
+    if (!entry) return { valid: false, code };
+    if (entry.isEarl && now > EARL_DEADLINE) return { valid: false, code, expired: true };
+    return { valid: true, code, ...entry };
+  }
+
+  const r1 = validateCode(c1);
+  const r2 = validateCode(c2);
+
+  if (c1 && !r1) { msg.className = 'discount-msg error'; msg.textContent = `Code "${c1}" not recognized.`; updateTotal(); return; }
+  if (c1 && r1 && !r1.valid) {
+    if (r1.expired) { msg.className = 'discount-msg error'; msg.textContent = `The Earl E. Byrd code expired May 5, 2026.`; updateTotal(); return; }
+    msg.className = 'discount-msg error'; msg.textContent = `Code "${c1}" not recognized.`; updateTotal(); return;
+  }
+  if (c2 && !r2) { msg.className = 'discount-msg error'; msg.textContent = `Code "${c2}" not recognized.`; updateTotal(); return; }
+  if (c2 && r2 && !r2.valid) {
+    if (r2.expired) { msg.className = 'discount-msg error'; msg.textContent = `The Earl E. Byrd code expired May 5, 2026.`; updateTotal(); return; }
+    msg.className = 'discount-msg error'; msg.textContent = `Code "${c2}" not recognized.`; updateTotal(); return;
+  }
+
+  const bothEarl = (r1 && r1.isEarl) && (r2 && r2.isEarl);
+  if (bothEarl) { msg.className = 'discount-msg error'; msg.textContent = `You can't combine two Earl E. Byrd codes.`; updateTotal(); return; }
+
+  const neitherEarl = r1 && r2 && !r1.isEarl && !r2.isEarl;
+  if (neitherEarl) { msg.className = 'discount-msg error'; msg.textContent = `Two standard codes can't be combined. The Earl E. Byrd code can be paired with one other code.`; updateTotal(); return; }
+
+  if (r1) { discountTotal += r1.amount; messages.push(`${r1.code}: -$${r1.amount}`); }
+  if (r2) { discountTotal += r2.amount; messages.push(`${r2.code}: -$${r2.amount}`); }
+
+  msg.className = 'discount-msg success';
+  msg.textContent = messages.length > 0 ? messages.join(' + ') + ` = $${discountTotal} off your total` : '';
+  updateTotal();
+}
+
+function getUnitPrice(total) {
+  if (total <= 0) return 0;
+  if (total === 1) return 745;
+  if (total <= 4) return 625;
+  return 575;
+}
+
+function getBaseTotal(totalEntries) {
+  if (totalEntries === 0) return 0;
+  if (totalEntries === 1) return 745;
+  return totalEntries * getUnitPrice(totalEntries);
+}
+
+function addProduct() {
+  const id = ++productCounter;
+  products.push({ id, name: '', categories: new Set() });
+  renderProducts();
+}
+
+function removeProduct(id) {
+  products = products.filter(p => p.id !== id);
+  renderProducts();
+}
+
+function renderProducts() {
+  const container = document.getElementById('products-container');
+  container.innerHTML = '';
+  products.forEach((prod, idx) => {
+    const div = document.createElement('div');
+    div.className = 'product-card';
+    div.id = 'product-' + prod.id;
+    let catHtml = '';
+    for (const [group, cats] of Object.entries(CATEGORIES)) {
+      catHtml += `<div class="cat-group"><div class="cat-group-label">${group}</div><div class="cat-grid">`;
+      cats.forEach(cat => {
+        const checked = prod.categories.has(cat);
+        const cid = 'c_' + prod.id + '_' + cat.replace(/\W+/g,'_');
+        catHtml += `<div class="cat-item${checked?' selected':''}" id="item_${cid}" onclick="toggleCat(${prod.id},'${cat.replace(/'/g,"\\'")}','${cid}')">
+          <input type="checkbox" id="${cid}" ${checked?'checked':''} onclick="event.stopPropagation();toggleCat(${prod.id},'${cat.replace(/'/g,"\\'")}','${cid}')">
+          <label for="${cid}">${cat}</label>
+        </div>`;
+      });
+      catHtml += `</div></div>`;
+    }
+    div.innerHTML = `
+      <div class="product-header">
+        <span id="ph-${prod.id}">Product ${idx+1}${prod.name?' — '+prod.name:''}</span>
+        ${products.length > 1 ? `<button class="remove-btn" onclick="removeProduct(${prod.id})">Remove product</button>` : ''}
+      </div>
+      <div class="product-body">
+        <div class="field">
+          <label>Product name *</label>
+          <input type="text" placeholder="Enter product name exactly as it should appear in promotions" value="${prod.name}" oninput="updateName(${prod.id}, this.value)">
+        </div>
+        <div class="cat-groups">${catHtml}</div>
+        <div class="product-subtotal">
+          <span class="cat-count" id="count-${prod.id}">${prod.categories.size} ${prod.categories.size===1?'category':'categories'} selected</span>
+          <span class="sub-amount" id="sub-${prod.id}">—</span>
+        </div>
+      </div>`;
+    container.appendChild(div);
+  });
+  updateTotal();
+}
+
+function updateName(id, val) {
+  const prod = products.find(p => p.id === id);
+  if (prod) {
+    prod.name = val;
+    const ph = document.getElementById('ph-' + id);
+    if (ph) ph.textContent = 'Product ' + (products.indexOf(prod)+1) + (val?' — '+val:'');
+  }
+  updateTotal();
+}
+
+function toggleCat(id, cat, cid) {
+  const prod = products.find(p => p.id === id);
+  if (!prod) return;
+  const el = document.getElementById('item_' + cid);
+  const cb = document.getElementById(cid);
+  if (prod.categories.has(cat)) {
+    prod.categories.delete(cat);
+    if (el) el.classList.remove('selected');
+    if (cb) cb.checked = false;
+  } else {
+    prod.categories.add(cat);
+    if (el) el.classList.add('selected');
+    if (cb) cb.checked = true;
+  }
+  const count = prod.categories.size;
+  const countEl = document.getElementById('count-' + id);
+  if (countEl) countEl.textContent = count + ' ' + (count===1?'category':'categories') + ' selected';
+  updateTotal();
+}
+
+function updateTotal() {
+  const totalEntries = products.reduce((sum, p) => sum + p.categories.size, 0);
+  const baseTotal = getBaseTotal(totalEntries);
+  const discount = Math.min(discountTotal, baseTotal);
+  const finalTotal = baseTotal - discount;
+
+  document.getElementById('total-display').textContent = '$' + finalTotal.toLocaleString();
+
+  let breakdownText = 'No entries selected yet';
+  if (totalEntries === 1) breakdownText = '1 entry at $745';
+  else if (totalEntries >= 2 && totalEntries <= 4) breakdownText = totalEntries + ' entries at $625 each';
+  else if (totalEntries >= 5) breakdownText = totalEntries + ' entries at $575 each';
+  document.getElementById('breakdown-text').textContent = breakdownText;
+
+  const unitPrice = getUnitPrice(totalEntries);
+  products.forEach(prod => {
+    const subEl = document.getElementById('sub-' + prod.id);
+    if (!subEl) return;
+    const c = prod.categories.size;
+    subEl.textContent = c === 0 ? '—' : '$' + (c === 1 && totalEntries === 1 ? 745 : c * unitPrice).toLocaleString();
+  });
+
+  const summarySection = document.getElementById('summary-section');
+  if (totalEntries > 0) {
+    summarySection.style.display = 'block';
+    let rows = `<div class="summary-row"><span>Subtotal (${totalEntries} ${totalEntries===1?'entry':'entries'})</span><span>$${baseTotal.toLocaleString()}</span></div>`;
+    if (discount > 0) rows += `<div class="summary-row discount"><span>Discount applied</span><span>-$${discount.toLocaleString()}</span></div>`;
+    rows += `<div class="summary-row total"><span>Total due</span><span>$${finalTotal.toLocaleString()}</span></div>`;
+    document.getElementById('summary-rows').innerHTML = rows;
+  } else {
+    summarySection.style.display = 'none';
+  }
+
+  const allNamed = products.length > 0 && products.every(p => p.name.trim() !== '') && totalEntries > 0;
+  const btn = document.getElementById('checkout-btn');
+  btn.disabled = !allNamed;
+  btn.textContent = allNamed
+    ? 'Proceed to payment — $' + finalTotal.toLocaleString()
+    : 'Enter a product name and select at least one category to continue';
+}
+
+addProduct();
+</script>
+</body>
+</html>
