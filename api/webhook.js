@@ -114,7 +114,8 @@ export default async function handler(req, res) {
     discountApplied: session.metadata?.discountApplied,
     stripeSessionId: session.id,
     paidAt: new Date(session.created * 1000).toISOString(),
-    surveyLinks
+surveyLinks,
+    surveyLinksHtml: buildSurveyLinksHtml(products, company, email)
   };
 
   try {
