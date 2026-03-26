@@ -42,6 +42,36 @@ function buildSurveyLinks(products, company, email) {
     return `${product.name}\nCategories:\n${categoryList}\nApplication link: ${url}`;
   }).join('\n\n---\n\n');
 }
+function buildSurveyLinksHtml(products, company, email) {
+  const blocks = products.map(product => {
+    const categoriesStr = Array.isArray(product.categories)
+      ? product.categories.join(', ')
+      : (product.categories || '');
+
+    const params = new URLSearchParams({
+      tt: QUESTIONPRO_SURVEY_ID,
+      custom1: product.name,
+      custom2: company,
+      custom3: email,
+      custom4: categoriesStr
+    });
+
+    const url = `${QUESTIONPRO_BASE_URL}?${params.toString()}`;
+    const categoryItems = Array.isArray(product.categories)
+      ? product.categories.map(c => `<li>${c}</li>`).join('')
+      : `<li>${product.categories}</li>`;
+
+    return `
+      <div style="margin-bottom:24px;padding:16px;border:1px solid #e0e0e0;border-radius:6px;">
+        <p style="margin:0 0 8px;font-weight:600;font-size:15px;">${product.name}</p>
+        <p style="margin:0 0 4px;font-size:13px;color:#555;">Categories entered:</p>
+        <ul style="margin:0 0 12px;padding-left:20px;font-size:13px;color:#333;">${categoryItems}</ul>
+        <a href="${url}" style="display:inline-block;background:#d82356;color:white;padding:10px 20px;border-radius:4px;text-decoration:none;font-size:13px;font-weight:600;">Complete application for ${product.name}</a>
+      </div>`;
+  }).join('');
+
+  return blocks;
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
