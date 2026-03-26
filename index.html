@@ -352,6 +352,54 @@ function updateTotal() {
 }
 
 addProduct();
+  async function handleCheckout() {
+  const btn = document.getElementById('checkout-btn');
+  btn.disabled = true;
+  btn.textContent = 'Redirecting to payment...';
+
+  try {
+    const totalEntries = products.reduce((sum, p) => sum + p.categories.size, 0);
+    const baseTotal = getBaseTotal(totalEntries);
+    const discount = Math.min(discountTotal, baseTotal);
+    const finalTotal = baseTotal - discount;
+
+    const appliedCodes = [];
+    const c1 = document.getElementById('code1').value.trim().toUpperCase();
+    const c2 = document.getElementById('code2') ? document.getElementById('code2').value.trim().toUpperCase() : '';
+    if (c1 && CODES[c1]) appliedCodes.push(c1);
+    if (c2 && CODES[c2]) appliedCodes.push(c2);
+
+    const payload = {
+      totalAmount: finalTotal,
+      entries: totalEntries,
+      discountApplied: discount,
+      discountCodes: appliedCodes,
+      products: products.map(p => ({
+        name: p.name,
+        categories: Array.from(p.categories)
+      }))
+    };
+
+    const res = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const { url } = await res.json();
+    window.location.href = url;
+
+  } catch (err) {
+    const totalEntries = products.reduce((sum, p) => sum + p.categories.size, 0);
+    const baseTotal = getBaseTotal(totalEntries);
+    const discount = Math.min(discountTotal, baseTotal);
+    const finalTotal = baseTotal - discount;
+
+    btn.disabled = false;
+    btn.textContent = 'Proceed to payment — $' + finalTotal.toLocaleString();
+    alert('Something went wrong. Please try again.');
+  }
+}
 </script>
 </body>
 </html>
