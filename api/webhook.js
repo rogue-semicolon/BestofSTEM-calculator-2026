@@ -23,7 +23,7 @@ async function getRawBody(req) {
 function buildSurveyLinks(products, company, email) {
   return products.map(product => {
     const categoriesStr = Array.isArray(product.categories)
-      ? product.categories.join(', ')
+      ? product.categories.join(',')
       : (product.categories || '');
 
     const params = new URLSearchParams({
