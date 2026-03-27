@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const ZAPIER_WEBHOOK_URL = 'https://hooks.zapier.com/hooks/catch/20377223/unb1vea/';
 const QUESTIONPRO_SURVEY_ID = '13481598';
-const QUESTIONPRO_BASE_URL = 'https://www.questionpro.com/a/TakeSurvey';
+const QUESTIONPRO_BASE_URL = 'https://catapult-x.questionpro.com/BestofSTEMentry';
 
 export const config = {
   api: {
