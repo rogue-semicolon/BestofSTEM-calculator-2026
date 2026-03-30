@@ -100,6 +100,10 @@ export default async function handler(req, res) {
   const companyField = session.custom_fields?.find(f => f.key === 'company_name');
   const company = companyField?.text?.value || '';
   const products = JSON.parse(session.metadata?.products || '[]');
+if (!products.length) {
+  return res.status(200).json({ received: true });
+}
+
   const amountPaid = session.amount_total / 100;
   const surveyLinks = buildSurveyLinks(products, company, email);
 
