@@ -31,7 +31,7 @@ body { font-family: 'Montserrat', sans-serif; background: var(--bg-secondary); c
 .tier-pill.t1 { background: var(--cx-teal-light); border-color: var(--cx-blue); color: var(--cx-teal); }
 .tier-pill.t2 { background: #e8f6e8; border-color: #1d9e75; color: #085041; }
 .tier-pill.t3 { background: #fef3e2; border-color: #ba7517; color: #633806; }
-.running-total-bottom { margin-bottom: 1.5rem; }
+.sticky-total { position: sticky; top: 0; z-index: 10; background: var(--bg-secondary); padding: 0.75rem 0; margin-bottom: 1.5rem; }
 .total-bar { background: var(--cx-teal-light); border: 1px solid var(--cx-blue); border-radius: var(--radius-md); padding: 0.85rem 1.25rem; display: flex; justify-content: space-between; align-items: center; }
 .total-label { font-size: 13px; color: var(--cx-teal); font-weight: 600; }
 .total-amount { font-size: 24px; font-weight: 600; color: var(--cx-teal); }
@@ -99,10 +99,7 @@ body { font-family: 'Montserrat', sans-serif; background: var(--bg-secondary); c
     <div class="tier-pill t3">5+ entries: $575 each</div>
   </div>
 
-  <div id="products-container"></div>
-  <button class="add-product-btn" onclick="addProduct()">+ Add another product</button>
-
-  <div class="running-total-bottom">
+  <div class="sticky-total">
     <div class="total-bar">
       <div>
         <div class="total-label">Running total</div>
@@ -111,6 +108,9 @@ body { font-family: 'Montserrat', sans-serif; background: var(--bg-secondary); c
       <div class="total-amount" id="total-display">$0</div>
     </div>
   </div>
+
+  <div id="products-container"></div>
+  <button class="add-product-btn" onclick="addProduct()">+ Add another product</button>
 
   <div class="discount-section">
     <span class="section-label">Discount or promo code</span>
@@ -132,78 +132,20 @@ body { font-family: 'Montserrat', sans-serif; background: var(--bg-secondary); c
     <div id="summary-rows"></div>
   </div>
 
- <button class="checkout-btn" id="checkout-btn" disabled onclick="handleCheckout()">Enter a product name and select at least one category to continue</button>
+  <button class="checkout-btn" id="checkout-btn" onclick="checkout()" disabled>Enter a product name and select at least one category to continue</button>
   <p class="note">After payment, you'll be redirected to the full application — your product name, company, and selected categories will be pre-filled.</p>
 </div>
 
 <script>
 const CATEGORIES = {
-  "Best of AI — New for 2026": [
-    "Best of AI: Ethical Practices for Student Learning",
-    "Best of AI: Advancing Digital Literacy",
-    "AI Supporting Teacher Professional Development",
-    "Best of AI Supporting Education Administrators",
-    "Best Innovation Using AI for Teaching & Learning",
-    "AI Teaching Assistant of the Year",
-    "AI for Personalized Learning at Scale",
-    "AI for Smarter Schools",
-    "AI Trailblazer Award",
-    "AI in School Safety & Response",
-    "AI for Inclusive Learning"
-  ],
-  "Educator Favorites": [
-    "Best Innovation of 2026",
-    "Best Customer Support",
-    "Best Freebies",
-    "Best Professional Development",
-    "Social Impact Award: Developing Citizen Scientists",
-    "Social Impact Award: Promoting Diversity & Equity Inclusion",
-    "Best of STEM for Data Collection & Analysis",
-    "Best of STEM for Out of School Time"
-  ],
-  "Best of STEM": [
-    "Best of STEM for Biology",
-    "Best of STEM for Chemistry",
-    "Best of STEM for Environmental Science",
-    "Best of STEM for Engineering Education",
-    "Best of STEM for Forensics",
-    "Best of STEM for Physics",
-    "Best of STEM for Mathematics",
-    "Best of STEM for Space Science",
-    "Best Integration of Language Arts (STEAM)",
-    "Best Resources for Analyzing and Interpreting Data",
-    "Best Video-Based Learning",
-    "Best Robotics for Teaching & Learning",
-    "Best of STEM Curricular Materials: Pre-K to Grade 2",
-    "Best of STEM: Hands-on Learning"
-  ],
-  "Career & Technical Education": [
-    "CTE Champions: Comprehensive CTE Solutions",
-    "CTE Champions: Coding & Computer Science",
-    "CTE Champions: Engineering",
-    "CTE Champions: Health Science",
-    "CTE Champions: STEM",
-    "CTE Champions: Manufacturing",
-    "CTE Champions: Invention Education"
-  ],
-  "Trailblazer": [
-    "Trailblazer: Biotechnology Innovator",
-    "Trailblazer: Early Learning (Pre-K–6)",
-    "Trailblazer: Hybrid Learning Superhero",
-    "Trailblazer: Immersive Reality (AR/VR)",
-    "Trailblazer: Inspiring Computational Thinking",
-    "Trailblazer: Phenomena-Based Teaching and Learning",
-    "Trailblazer: Simulations for STEM",
-    "Trailblazer: Virtual Labs Luminary",
-    "Trailblazer: Middle School STEM—Grades 4–8"
-  ],
-  "Bridging the Gap": [
-    "Bridging the Gap: English Language Learners",
-    "Bridging the Gap: Math Intervention Resources",
-    "Bridging the Gap: Professional Development",
-    "Bridging the Gap: Tutoring Programs for STEM",
-    "Bridging the Gap: Webinar Series Exemplar"
-  ]
+  "AI Awards": ["AI for Personalized Learning at Scale","AI for Smarter Schools","AI in School Safety & Response","AI Teaching Assistant of the Year","AI Trailblazer Award","Best AI Literacy Solution","Best AI Innovation for Teaching & Learning"],
+  "Best of STEM: Subject Areas": ["Best of STEM for Biology","Best of STEM for Chemistry","Best of STEM for Data Collection & Analysis","Best of STEM for Engineering Education","Best of STEM for Environmental Science","Best of STEM for Mathematics","Best of STEM for Physics","Best of STEM for Space Science"],
+  "Best of STEM: Teaching & Learning": ["Best of STEM: Differentiated Instruction for Teaching & Learning","Best of STEM: Hands-on Learning","Best of STEM Curricular Materials: Pre-K to Grade 2","Best Digital Ecosystem for STEM Teachers","Best Hands-On Materials for OpenSciEd","Best Robotics for Teaching & Learning","Best Video-Based Learning"],
+  "Program & Innovation Awards": ["Best Customer Support","Best Entrepreneurship Program for Career & Technical Education (CTE)","Best Freebies","Best Innovation of 2026","Best Integration of Language Arts (STEAM)","Best Professional Development","Best Resources for Analyzing and Interpreting Data"],
+  "Bridging the Gap": ["Bridging the Gap: English Language Learners","Bridging the Gap: Math Intervention Resources","Bridging the Gap: Professional Development","Bridging the Gap: Tutoring Programs for STEM","Bridging the Gap: Webinar Series Exemplar"],
+  "CTE Champions": ["CTE Champion: International Impact","CTE Champion: Manufacturing","CTE Champions: Coding & Computer Science","CTE Champions: Comprehensive CTE Solutions","CTE Champions: Engineering","CTE Champions: Health Science","CTE Champions: Invention Education","CTE Champions: STEM"],
+  "Social Impact": ["Social Impact Award: Developing Citizen Scientists","Social Impact Award: Promoting Diversity & Equity Inclusion"],
+  "Trailblazer": ["Trailblazer: Biotechnology Innovator","Trailblazer: Early Learning (Pre-K-6)","Trailblazer: Hybrid Learning Superhero","Trailblazer: Immersive Reality (AR/VR)","Trailblazer: Inspiring Computational Thinking","Trailblazer: Middle School STEM—Grades 4-8","Trailblazer: Phenomena-Based Teaching and Learning","Trailblazer: Simulations for STEM","Trailblazer: Virtual Labs Luminary"]
 };
 
 const EARL_CODE = "EARLE.BYRD2026";
@@ -212,10 +154,7 @@ const EARL_DEADLINE = new Date("2026-05-05T23:59:59");
 const CODES = {
   "EARLE.BYRD2026": { amount: 100, isEarl: true },
   "KEHLUV2026":     { amount: 100, isEarl: false },
-  "2026AWARDS":     { amount: 50,  isEarl: false },
-  "DOLS2026":       { amount: 50,  isEarl: false },
-  // TEST CODE — REMOVE BEFORE PRODUCTION
-  "CX-QA-TEST-2026": { amount: 744, isEarl: false }
+  "2026AWARDS":     { amount: 50,  isEarl: false }
 };
 
 let products = [];
@@ -412,11 +351,11 @@ function updateTotal() {
     : 'Enter a product name and select at least one category to continue';
 }
 
-addProduct();
-  async function handleCheckout() {
+async function checkout() {
   const btn = document.getElementById('checkout-btn');
+  const originalText = btn.textContent;
   btn.disabled = true;
-  btn.textContent = 'Redirecting to payment...';
+  btn.textContent = 'Redirecting to checkout…';
 
   try {
     const totalEntries = products.reduce((sum, p) => sum + p.categories.size, 0);
@@ -424,43 +363,45 @@ addProduct();
     const discount = Math.min(discountTotal, baseTotal);
     const finalTotal = baseTotal - discount;
 
-    const appliedCodes = [];
     const c1 = document.getElementById('code1').value.trim().toUpperCase();
-    const c2 = document.getElementById('code2') ? document.getElementById('code2').value.trim().toUpperCase() : '';
-    if (c1 && CODES[c1]) appliedCodes.push(c1);
-    if (c2 && CODES[c2]) appliedCodes.push(c2);
+    const c2 = secondCodeVisible ? document.getElementById('code2').value.trim().toUpperCase() : '';
+    const appliedCodes = [c1, c2].filter(c => c && CODES[c]);
 
-    const payload = {
-      totalAmount: finalTotal,
-      entries: totalEntries,
-      discountApplied: discount,
-      discountCodes: appliedCodes,
-      products: products.map(p => ({
-        name: p.name,
-        categories: Array.from(p.categories)
-      }))
-    };
+    const productsPayload = products.map(p => ({
+      name: p.name.trim(),
+      categories: Array.from(p.categories)
+    }));
 
-    const res = await fetch('/api/checkout', {
+    const response = await fetch('/api/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({
+        totalAmount: finalTotal,
+        entries: totalEntries,
+        discountApplied: discount,
+        discountCodes: appliedCodes,
+        products: productsPayload
+      })
     });
 
-    const { url } = await res.json();
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.error || `Checkout failed (${response.status})`);
+    }
+
+    const { url } = await response.json();
+    if (!url) throw new Error('No checkout URL returned from server');
+
     window.location.href = url;
-
   } catch (err) {
-    const totalEntries = products.reduce((sum, p) => sum + p.categories.size, 0);
-    const baseTotal = getBaseTotal(totalEntries);
-    const discount = Math.min(discountTotal, baseTotal);
-    const finalTotal = baseTotal - discount;
-
+    console.error('Checkout error:', err);
+    alert('Sorry — checkout could not start.\n\n' + err.message);
     btn.disabled = false;
-    btn.textContent = 'Proceed to payment — $' + finalTotal.toLocaleString();
-    alert('Something went wrong. Please try again.');
+    btn.textContent = originalText;
   }
 }
+
+addProduct();
 </script>
 </body>
 </html>
