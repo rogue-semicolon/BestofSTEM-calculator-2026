@@ -92,13 +92,11 @@ body { font-family: 'Montserrat', sans-serif; background: var(--bg-secondary); c
     <h1>2026 Best of STEM Awards — Entry & Pricing</h1>
     <div class="tagline">Select your categories, see your total, then pay to unlock the full application (pre-filled with your info)</div>
   </div>
-
   <div class="tier-legend">
     <div class="tier-pill t1">1 entry: $745</div>
     <div class="tier-pill t2">2–4 entries: $625 each</div>
     <div class="tier-pill t3">5+ entries: $575 each</div>
   </div>
-
   <div class="sticky-total">
     <div class="total-bar">
       <div>
@@ -108,10 +106,8 @@ body { font-family: 'Montserrat', sans-serif; background: var(--bg-secondary); c
       <div class="total-amount" id="total-display">$0</div>
     </div>
   </div>
-
   <div id="products-container"></div>
   <button class="add-product-btn" onclick="addProduct()">+ Add another product</button>
-
   <div class="discount-section">
     <span class="section-label">Discount or promo code</span>
     <div class="discount-hint">Have the <strong>Earl E. Byrd early bird code?</strong> It can be combined with one additional code. <span class="deadline-badge">Expires May 5, 2026</span></div>
@@ -127,15 +123,12 @@ body { font-family: 'Montserrat', sans-serif; background: var(--bg-secondary); c
     </div>
     <div class="discount-msg" id="discount-msg"></div>
   </div>
-
   <div class="summary-section" id="summary-section" style="display:none;">
     <div id="summary-rows"></div>
   </div>
-
   <button class="checkout-btn" id="checkout-btn" onclick="checkout()" disabled>Enter a product name and select at least one category to continue</button>
   <p class="note">After payment, you'll be redirected to the full application — your product name, company, and selected categories will be pre-filled.</p>
 </div>
-
 <script>
 const CATEGORIES = {
   "AI Awards": ["AI for Personalized Learning at Scale","AI for Smarter Schools","AI in School Safety & Response","AI Teaching Assistant of the Year","AI Trailblazer Award","Best AI Literacy Solution","Best AI Innovation for Teaching & Learning"],
@@ -147,38 +140,32 @@ const CATEGORIES = {
   "Social Impact": ["Social Impact Award: Developing Citizen Scientists","Social Impact Award: Promoting Diversity & Equity Inclusion"],
   "Trailblazer": ["Trailblazer: Biotechnology Innovator","Trailblazer: Early Learning (Pre-K-6)","Trailblazer: Hybrid Learning Superhero","Trailblazer: Immersive Reality (AR/VR)","Trailblazer: Inspiring Computational Thinking","Trailblazer: Middle School STEM—Grades 4-8","Trailblazer: Phenomena-Based Teaching and Learning","Trailblazer: Simulations for STEM","Trailblazer: Virtual Labs Luminary"]
 };
-
 const EARL_CODE = "EARLE.BYRD2026";
 const EARL_DEADLINE = new Date("2026-05-05T23:59:59");
-
 const CODES = {
   "EARLE.BYRD2026": { amount: 100, isEarl: true },
   "KEHLUV2026":     { amount: 100, isEarl: false },
-  "2026AWARDS":     { amount: 50,  isEarl: false }
+  "2026AWARDS":     { amount: 50,  isEarl: false },
+  "DOLS2026":       { amount: 50,  isEarl: false }
 };
-
 let products = [];
 let discountTotal = 0;
 let productCounter = 0;
 let secondCodeVisible = false;
-
 function showSecondCode() {
   document.getElementById('code2-row').style.display = 'flex';
   document.getElementById('add-code-btn').style.display = 'none';
   secondCodeVisible = true;
 }
-
 function applyCodes() {
-  const c1 = document.getElementById('code1').value.trim().toUpperCase();
-  const c2 = secondCodeVisible ? document.getElementById('code2').value.trim().toUpperCase() : '';
+  const c1 = document.getElementById('code1').value.trim().replace(/\s+/g, '').toUpperCase();
+  const c2 = secondCodeVisible ? document.getElementById('code2').value.trim().replace(/\s+/g, '').toUpperCase() : '';
   const msg = document.getElementById('discount-msg');
   const now = new Date();
-
   discountTotal = 0;
   let messages = [];
   let hasEarl = false;
   let validCodes = [];
-
   function validateCode(code) {
     if (!code) return null;
     const entry = CODES[code];
@@ -186,10 +173,8 @@ function applyCodes() {
     if (entry.isEarl && now > EARL_DEADLINE) return { valid: false, code, expired: true };
     return { valid: true, code, ...entry };
   }
-
   const r1 = validateCode(c1);
   const r2 = validateCode(c2);
-
   if (c1 && !r1) { msg.className = 'discount-msg error'; msg.textContent = `Code "${c1}" not recognized.`; updateTotal(); return; }
   if (c1 && r1 && !r1.valid) {
     if (r1.expired) { msg.className = 'discount-msg error'; msg.textContent = `The Earl E. Byrd code expired May 5, 2026.`; updateTotal(); return; }
@@ -200,45 +185,36 @@ function applyCodes() {
     if (r2.expired) { msg.className = 'discount-msg error'; msg.textContent = `The Earl E. Byrd code expired May 5, 2026.`; updateTotal(); return; }
     msg.className = 'discount-msg error'; msg.textContent = `Code "${c2}" not recognized.`; updateTotal(); return;
   }
-
   const bothEarl = (r1 && r1.isEarl) && (r2 && r2.isEarl);
   if (bothEarl) { msg.className = 'discount-msg error'; msg.textContent = `You can't combine two Earl E. Byrd codes.`; updateTotal(); return; }
-
   const neitherEarl = r1 && r2 && !r1.isEarl && !r2.isEarl;
   if (neitherEarl) { msg.className = 'discount-msg error'; msg.textContent = `Two standard codes can't be combined. The Earl E. Byrd code can be paired with one other code.`; updateTotal(); return; }
-
   if (r1) { discountTotal += r1.amount; messages.push(`${r1.code}: -$${r1.amount}`); }
   if (r2) { discountTotal += r2.amount; messages.push(`${r2.code}: -$${r2.amount}`); }
-
   msg.className = 'discount-msg success';
   msg.textContent = messages.length > 0 ? messages.join(' + ') + ` = $${discountTotal} off your total` : '';
   updateTotal();
 }
-
 function getUnitPrice(total) {
   if (total <= 0) return 0;
   if (total === 1) return 745;
   if (total <= 4) return 625;
   return 575;
 }
-
 function getBaseTotal(totalEntries) {
   if (totalEntries === 0) return 0;
   if (totalEntries === 1) return 745;
   return totalEntries * getUnitPrice(totalEntries);
 }
-
 function addProduct() {
   const id = ++productCounter;
   products.push({ id, name: '', categories: new Set() });
   renderProducts();
 }
-
 function removeProduct(id) {
   products = products.filter(p => p.id !== id);
   renderProducts();
 }
-
 function renderProducts() {
   const container = document.getElementById('products-container');
   container.innerHTML = '';
@@ -279,7 +255,6 @@ function renderProducts() {
   });
   updateTotal();
 }
-
 function updateName(id, val) {
   const prod = products.find(p => p.id === id);
   if (prod) {
@@ -289,7 +264,6 @@ function updateName(id, val) {
   }
   updateTotal();
 }
-
 function toggleCat(id, cat, cid) {
   const prod = products.find(p => p.id === id);
   if (!prod) return;
@@ -309,21 +283,17 @@ function toggleCat(id, cat, cid) {
   if (countEl) countEl.textContent = count + ' ' + (count===1?'category':'categories') + ' selected';
   updateTotal();
 }
-
 function updateTotal() {
   const totalEntries = products.reduce((sum, p) => sum + p.categories.size, 0);
   const baseTotal = getBaseTotal(totalEntries);
   const discount = Math.min(discountTotal, baseTotal);
   const finalTotal = baseTotal - discount;
-
   document.getElementById('total-display').textContent = '$' + finalTotal.toLocaleString();
-
   let breakdownText = 'No entries selected yet';
   if (totalEntries === 1) breakdownText = '1 entry at $745';
   else if (totalEntries >= 2 && totalEntries <= 4) breakdownText = totalEntries + ' entries at $625 each';
   else if (totalEntries >= 5) breakdownText = totalEntries + ' entries at $575 each';
   document.getElementById('breakdown-text').textContent = breakdownText;
-
   const unitPrice = getUnitPrice(totalEntries);
   products.forEach(prod => {
     const subEl = document.getElementById('sub-' + prod.id);
@@ -331,7 +301,6 @@ function updateTotal() {
     const c = prod.categories.size;
     subEl.textContent = c === 0 ? '—' : '$' + (c === 1 && totalEntries === 1 ? 745 : c * unitPrice).toLocaleString();
   });
-
   const summarySection = document.getElementById('summary-section');
   if (totalEntries > 0) {
     summarySection.style.display = 'block';
@@ -342,7 +311,6 @@ function updateTotal() {
   } else {
     summarySection.style.display = 'none';
   }
-
   const allNamed = products.length > 0 && products.every(p => p.name.trim() !== '') && totalEntries > 0;
   const btn = document.getElementById('checkout-btn');
   btn.disabled = !allNamed;
@@ -350,28 +318,23 @@ function updateTotal() {
     ? 'Proceed to payment — $' + finalTotal.toLocaleString()
     : 'Enter a product name and select at least one category to continue';
 }
-
 async function checkout() {
   const btn = document.getElementById('checkout-btn');
   const originalText = btn.textContent;
   btn.disabled = true;
   btn.textContent = 'Redirecting to checkout…';
-
   try {
     const totalEntries = products.reduce((sum, p) => sum + p.categories.size, 0);
     const baseTotal = getBaseTotal(totalEntries);
     const discount = Math.min(discountTotal, baseTotal);
     const finalTotal = baseTotal - discount;
-
-    const c1 = document.getElementById('code1').value.trim().toUpperCase();
-    const c2 = secondCodeVisible ? document.getElementById('code2').value.trim().toUpperCase() : '';
+    const c1 = document.getElementById('code1').value.trim().replace(/\s+/g, '').toUpperCase();
+    const c2 = secondCodeVisible ? document.getElementById('code2').value.trim().replace(/\s+/g, '').toUpperCase() : '';
     const appliedCodes = [c1, c2].filter(c => c && CODES[c]);
-
     const productsPayload = products.map(p => ({
       name: p.name.trim(),
       categories: Array.from(p.categories)
     }));
-
     const response = await fetch('/api/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -383,15 +346,12 @@ async function checkout() {
         products: productsPayload
       })
     });
-
     if (!response.ok) {
       const errData = await response.json().catch(() => ({}));
       throw new Error(errData.error || `Checkout failed (${response.status})`);
     }
-
     const { url } = await response.json();
     if (!url) throw new Error('No checkout URL returned from server');
-
     window.location.href = url;
   } catch (err) {
     console.error('Checkout error:', err);
@@ -400,7 +360,6 @@ async function checkout() {
     btn.textContent = originalText;
   }
 }
-
 addProduct();
 </script>
 </body>
