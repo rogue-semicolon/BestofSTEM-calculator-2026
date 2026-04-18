@@ -68,30 +68,31 @@ function computeDiscount(rawCodes, now = new Date()) {
   };
 }
 
-// Stripe metadata values are capped at 500 chars. Compact the products payload
-// aggressively so even a heavy cart stays under the limit.
+// Stripe metadata values are capped at 500 chars. Keep the shape
+// ({name, categories}) that webhook.js expects, but truncate names if needed.
 function buildProductsMetadata(cleanProducts) {
-  const compact = cleanProducts.map(p => ({
-    n: p.name,
-    c: p.categories
+  let payload = cleanProducts.map(p => ({
+    name: p.name,
+    categories: p.categories
   }));
-  let json = JSON.stringify(compact);
+  let json = JSON.stringify(payload);
   if (json.length <= 490) return json;
 
-  // Progressively truncate category/product names until we fit.
-  const truncated = cleanProducts.map(p => ({
-    n: p.name.length > 40 ? p.name.slice(0, 37) + '...' : p.name,
-    c: p.categories.map(c => c.length > 45 ? c.slice(0, 42) + '...' : c)
+  // Progressively truncate long names.
+  payload = cleanProducts.map(p => ({
+    name: p.name.length > 50 ? p.name.slice(0, 47) + '...' : p.name,
+    categories: p.categories.map(c => c.length > 55 ? c.slice(0, 52) + '...' : c)
   }));
-  json = JSON.stringify(truncated);
+  json = JSON.stringify(payload);
   if (json.length <= 490) return json;
 
-  // Last resort — just store product names + category counts.
-  const summary = cleanProducts.map(p => ({
-    n: p.name.length > 40 ? p.name.slice(0, 37) + '...' : p.name,
-    ce: p.categories.length
+  // Still too long — trim each product name more aggressively.
+  payload = cleanProducts.map(p => ({
+    name: p.name.length > 30 ? p.name.slice(0, 27) + '...' : p.name,
+    categories: p.categories.map(c => c.length > 45 ? c.slice(0, 42) + '...' : c)
   }));
-  return JSON.stringify(summary).slice(0, 490);
+  json = JSON.stringify(payload);
+  return json.length <= 490 ? json : json.slice(0, 490);
 }
 
 module.exports = async function handler(req, res) {
