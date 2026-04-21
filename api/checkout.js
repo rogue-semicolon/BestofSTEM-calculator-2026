@@ -12,8 +12,22 @@ const CODES = {
 
 function normalizeCode(raw) {
   if (!raw || typeof raw !== 'string') return '';
-  // Strip all whitespace and uppercase — lets "EARL E. BYRD 2026" match "EARLE.BYRD2026"
-  return raw.replace(/\s+/g, '').toUpperCase();
+  const trimmed = raw.trim();
+  if (!trimmed) return '';
+  // Exact match path (period preserved). Lets "EARL E. BYRD 2026" match "EARLE.BYRD2026".
+  const upperNoSpaces = trimmed.replace(/\s+/g, '').toUpperCase();
+  if (CODES[upperNoSpaces]) return upperNoSpaces;
+  // Forgiving path: strip all non-alphanumerics and compare.
+  // Also accepts the Earl code without the trailing "2026" ("Earl E. Byrd" is how people say it).
+  const stripped = trimmed.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+  if (!stripped) return '';
+  for (const key of Object.keys(CODES)) {
+    const keyStripped = key.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    if (stripped === keyStripped) return key;
+    if (CODES[key].isEarl && stripped === keyStripped.replace(/2026$/, '')) return key;
+  }
+  // No match — return the stripped form so server logs reflect the attempt.
+  return upperNoSpaces;
 }
 
 function getUnitPrice(totalEntries) {
