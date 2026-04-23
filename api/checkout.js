@@ -7,8 +7,7 @@ const CODES = {
   'EARLE.BYRD2026': { amount: 100, isEarl: true },
   'KEHLUV2026':     { amount: 100, isEarl: false },
   '2026AWARDS':     { amount: 50,  isEarl: false },
-  'DOLS2026':       { amount: 50,  isEarl: false },
-  'Finnpartners2026': { amount: 50,  isEarl: false }
+  'DOLS2026':       { amount: 50,  isEarl: false }
 };
 
 function normalizeCode(raw) {
