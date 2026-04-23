@@ -31,7 +31,7 @@ body { font-family: 'Montserrat', sans-serif; background: var(--bg-secondary); c
 .tier-pill.t1 { background: var(--cx-teal-light); border-color: var(--cx-blue); color: var(--cx-teal); }
 .tier-pill.t2 { background: #e8f6e8; border-color: #1d9e75; color: #085041; }
 .tier-pill.t3 { background: #fef3e2; border-color: #ba7517; color: #633806; }
-.sticky-total { position: sticky; top: 0; z-index: 10; background: var(--bg-secondary); padding: 0.75rem 0; margin-bottom: 1.5rem; }
+.running-total-bottom { margin-bottom: 1.5rem; }
 .total-bar { background: var(--cx-teal-light); border: 1px solid var(--cx-blue); border-radius: var(--radius-md); padding: 0.85rem 1.25rem; display: flex; justify-content: space-between; align-items: center; }
 .total-label { font-size: 13px; color: var(--cx-teal); font-weight: 600; }
 .total-amount { font-size: 24px; font-weight: 600; color: var(--cx-teal); }
@@ -92,12 +92,17 @@ body { font-family: 'Montserrat', sans-serif; background: var(--bg-secondary); c
     <h1>2026 Best of STEM Awards — Entry & Pricing</h1>
     <div class="tagline">Select your categories, see your total, then pay to unlock the full application (pre-filled with your info)</div>
   </div>
+
   <div class="tier-legend">
     <div class="tier-pill t1">1 entry: $745</div>
     <div class="tier-pill t2">2–4 entries: $625 each</div>
     <div class="tier-pill t3">5+ entries: $575 each</div>
   </div>
-  <div class="sticky-total">
+
+  <div id="products-container"></div>
+  <button class="add-product-btn" onclick="addProduct()">+ Add another product</button>
+
+  <div class="running-total-bottom">
     <div class="total-bar">
       <div>
         <div class="total-label">Running total</div>
@@ -106,8 +111,7 @@ body { font-family: 'Montserrat', sans-serif; background: var(--bg-secondary); c
       <div class="total-amount" id="total-display">$0</div>
     </div>
   </div>
-  <div id="products-container"></div>
-  <button class="add-product-btn" onclick="addProduct()">+ Add another product</button>
+
   <div class="discount-section">
     <span class="section-label">Discount or promo code</span>
     <div class="discount-hint">Have the <strong>Earl E. Byrd early bird code?</strong> It can be combined with one additional code. <span class="deadline-badge">Expires May 5, 2026</span></div>
@@ -123,72 +127,117 @@ body { font-family: 'Montserrat', sans-serif; background: var(--bg-secondary); c
     </div>
     <div class="discount-msg" id="discount-msg"></div>
   </div>
+
   <div class="summary-section" id="summary-section" style="display:none;">
     <div id="summary-rows"></div>
   </div>
-  <button class="checkout-btn" id="checkout-btn" onclick="checkout()" disabled>Enter a product name and select at least one category to continue</button>
+
+ <button class="checkout-btn" id="checkout-btn" disabled onclick="handleCheckout()">Enter a product name and select at least one category to continue</button>
   <p class="note">After payment, you'll be redirected to the full application — your product name, company, and selected categories will be pre-filled.</p>
 </div>
+
 <script>
 const CATEGORIES = {
-  "AI Awards": ["AI for Personalized Learning at Scale","AI for Smarter Schools","AI in School Safety & Response","AI Teaching Assistant of the Year","AI Trailblazer Award","Best AI Literacy Solution","Best AI Innovation for Teaching & Learning"],
-  "Best of STEM: Subject Areas": ["Best of STEM for Biology","Best of STEM for Chemistry","Best of STEM for Data Collection & Analysis","Best of STEM for Engineering Education","Best of STEM for Environmental Science","Best of STEM for Mathematics","Best of STEM for Physics","Best of STEM for Space Science"],
-  "Best of STEM: Teaching & Learning": ["Best of STEM: Differentiated Instruction for Teaching & Learning","Best of STEM: Hands-on Learning","Best of STEM Curricular Materials: Pre-K to Grade 2","Best Digital Ecosystem for STEM Teachers","Best Hands-On Materials for OpenSciEd","Best Robotics for Teaching & Learning","Best Video-Based Learning"],
-  "Program & Innovation Awards": ["Best Customer Support","Best Entrepreneurship Program for Career & Technical Education (CTE)","Best Freebies","Best Innovation of 2026","Best Integration of Language Arts (STEAM)","Best Professional Development","Best Resources for Analyzing and Interpreting Data"],
-  "Bridging the Gap": ["Bridging the Gap: English Language Learners","Bridging the Gap: Math Intervention Resources","Bridging the Gap: Professional Development","Bridging the Gap: Tutoring Programs for STEM","Bridging the Gap: Webinar Series Exemplar"],
-  "CTE Champions": ["CTE Champion: International Impact","CTE Champion: Manufacturing","CTE Champions: Coding & Computer Science","CTE Champions: Comprehensive CTE Solutions","CTE Champions: Engineering","CTE Champions: Health Science","CTE Champions: Invention Education","CTE Champions: STEM"],
-  "Social Impact": ["Social Impact Award: Developing Citizen Scientists","Social Impact Award: Promoting Diversity & Equity Inclusion"],
-  "Trailblazer": ["Trailblazer: Biotechnology Innovator","Trailblazer: Early Learning (Pre-K-6)","Trailblazer: Hybrid Learning Superhero","Trailblazer: Immersive Reality (AR/VR)","Trailblazer: Inspiring Computational Thinking","Trailblazer: Middle School STEM—Grades 4-8","Trailblazer: Phenomena-Based Teaching and Learning","Trailblazer: Simulations for STEM","Trailblazer: Virtual Labs Luminary"]
+  "Best of AI — New for 2026": [
+    "Best of AI: Ethical Practices for Student Learning",
+    "Best of AI: Advancing Digital Literacy",
+    "AI Supporting Teacher Professional Development",
+    "Best of AI Supporting Education Administrators",
+    "Best Innovation Using AI for Teaching & Learning",
+    "AI Teaching Assistant of the Year",
+    "AI for Personalized Learning at Scale",
+    "AI for Smarter Schools",
+    "AI Trailblazer Award",
+    "AI in School Safety & Response",
+    "AI for Inclusive Learning"
+  ],
+  "Educator Favorites": [
+    "Best Innovation of 2026",
+    "Best Customer Support",
+    "Best Freebies",
+    "Best Professional Development",
+    "Social Impact Award: Developing Citizen Scientists",
+    "Social Impact Award: Promoting Diversity & Equity Inclusion",
+    "Best of STEM for Data Collection & Analysis",
+    "Best of STEM for Out of School Time"
+  ],
+  "Best of STEM": [
+    "Best of STEM for Biology",
+    "Best of STEM for Chemistry",
+    "Best of STEM for Environmental Science",
+    "Best of STEM for Engineering Education",
+    "Best of STEM for Forensics",
+    "Best of STEM for Physics",
+    "Best of STEM for Mathematics",
+    "Best of STEM for Space Science",
+    "Best Integration of Language Arts (STEAM)",
+    "Best Resources for Analyzing and Interpreting Data",
+    "Best Video-Based Learning",
+    "Best Robotics for Teaching & Learning",
+    "Best of STEM Curricular Materials: Pre-K to Grade 2",
+    "Best of STEM: Hands-on Learning"
+  ],
+  "Career & Technical Education": [
+    "CTE Champions: Comprehensive CTE Solutions",
+    "CTE Champions: Coding & Computer Science",
+    "CTE Champions: Engineering",
+    "CTE Champions: Health Science",
+    "CTE Champions: STEM",
+    "CTE Champions: Manufacturing",
+    "CTE Champions: Invention Education"
+  ],
+  "Trailblazer": [
+    "Trailblazer: Biotechnology Innovator",
+    "Trailblazer: Early Learning (Pre-K–6)",
+    "Trailblazer: Hybrid Learning Superhero",
+    "Trailblazer: Immersive Reality (AR/VR)",
+    "Trailblazer: Inspiring Computational Thinking",
+    "Trailblazer: Phenomena-Based Teaching and Learning",
+    "Trailblazer: Simulations for STEM",
+    "Trailblazer: Virtual Labs Luminary",
+    "Trailblazer: Middle School STEM—Grades 4–8"
+  ],
+  "Bridging the Gap": [
+    "Bridging the Gap: English Language Learners",
+    "Bridging the Gap: Math Intervention Resources",
+    "Bridging the Gap: Professional Development",
+    "Bridging the Gap: Tutoring Programs for STEM",
+    "Bridging the Gap: Webinar Series Exemplar"
+  ]
 };
+
 const EARL_CODE = "EARLE.BYRD2026";
 const EARL_DEADLINE = new Date("2026-05-05T23:59:59");
+
 const CODES = {
   "EARLE.BYRD2026": { amount: 100, isEarl: true },
   "KEHLUV2026":     { amount: 100, isEarl: false },
   "2026AWARDS":     { amount: 50,  isEarl: false },
   "DOLS2026":       { amount: 50,  isEarl: false }
 };
-// Resolve user input ("Earl E. Byrd", "earlebyrd2026", "EARL E BYRD 2026", etc.) to a
-// canonical CODES key. Strips all non-alphanumerics and uppercases before comparing.
-// For the Earl E. Byrd code, the trailing year is also optional — people say the code
-// out loud as "Earl E. Byrd" and often drop the 2026.
-function normalizeToCanonical(raw) {
-  if (!raw) return '';
-  const trimmed = String(raw).trim();
-  if (!trimmed) return '';
-  const stripped = trimmed.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-  if (!stripped) return '';
-  // Exact match (period preserved) — fastest path and keeps backward compat.
-  const upperNoSpaces = trimmed.replace(/\s+/g, '').toUpperCase();
-  if (CODES[upperNoSpaces]) return upperNoSpaces;
-  // Strip-based match against every known code.
-  for (const key of Object.keys(CODES)) {
-    const keyStripped = key.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-    if (stripped === keyStripped) return key;
-    // Earl code: accept the input without the trailing "2026".
-    if (CODES[key].isEarl && stripped === keyStripped.replace(/2026$/, '')) return key;
-  }
-  // No match — return the stripped form so the error message reads naturally.
-  return upperNoSpaces;
-}
+
 let products = [];
 let discountTotal = 0;
 let productCounter = 0;
 let secondCodeVisible = false;
+
 function showSecondCode() {
   document.getElementById('code2-row').style.display = 'flex';
   document.getElementById('add-code-btn').style.display = 'none';
   secondCodeVisible = true;
 }
+
 function applyCodes() {
-  const c1 = normalizeToCanonical(document.getElementById('code1').value);
-  const c2 = secondCodeVisible ? normalizeToCanonical(document.getElementById('code2').value) : '';
+  const c1 = document.getElementById('code1').value.trim().toUpperCase();
+  const c2 = secondCodeVisible ? document.getElementById('code2').value.trim().toUpperCase() : '';
   const msg = document.getElementById('discount-msg');
   const now = new Date();
+
   discountTotal = 0;
   let messages = [];
   let hasEarl = false;
   let validCodes = [];
+
   function validateCode(code) {
     if (!code) return null;
     const entry = CODES[code];
@@ -196,8 +245,10 @@ function applyCodes() {
     if (entry.isEarl && now > EARL_DEADLINE) return { valid: false, code, expired: true };
     return { valid: true, code, ...entry };
   }
+
   const r1 = validateCode(c1);
   const r2 = validateCode(c2);
+
   if (c1 && !r1) { msg.className = 'discount-msg error'; msg.textContent = `Code "${c1}" not recognized.`; updateTotal(); return; }
   if (c1 && r1 && !r1.valid) {
     if (r1.expired) { msg.className = 'discount-msg error'; msg.textContent = `The Earl E. Byrd code expired May 5, 2026.`; updateTotal(); return; }
@@ -208,36 +259,45 @@ function applyCodes() {
     if (r2.expired) { msg.className = 'discount-msg error'; msg.textContent = `The Earl E. Byrd code expired May 5, 2026.`; updateTotal(); return; }
     msg.className = 'discount-msg error'; msg.textContent = `Code "${c2}" not recognized.`; updateTotal(); return;
   }
+
   const bothEarl = (r1 && r1.isEarl) && (r2 && r2.isEarl);
   if (bothEarl) { msg.className = 'discount-msg error'; msg.textContent = `You can't combine two Earl E. Byrd codes.`; updateTotal(); return; }
+
   const neitherEarl = r1 && r2 && !r1.isEarl && !r2.isEarl;
   if (neitherEarl) { msg.className = 'discount-msg error'; msg.textContent = `Two standard codes can't be combined. The Earl E. Byrd code can be paired with one other code.`; updateTotal(); return; }
+
   if (r1) { discountTotal += r1.amount; messages.push(`${r1.code}: -$${r1.amount}`); }
   if (r2) { discountTotal += r2.amount; messages.push(`${r2.code}: -$${r2.amount}`); }
+
   msg.className = 'discount-msg success';
   msg.textContent = messages.length > 0 ? messages.join(' + ') + ` = $${discountTotal} off your total` : '';
   updateTotal();
 }
+
 function getUnitPrice(total) {
   if (total <= 0) return 0;
   if (total === 1) return 745;
   if (total <= 4) return 625;
   return 575;
 }
+
 function getBaseTotal(totalEntries) {
   if (totalEntries === 0) return 0;
   if (totalEntries === 1) return 745;
   return totalEntries * getUnitPrice(totalEntries);
 }
+
 function addProduct() {
   const id = ++productCounter;
   products.push({ id, name: '', categories: new Set() });
   renderProducts();
 }
+
 function removeProduct(id) {
   products = products.filter(p => p.id !== id);
   renderProducts();
 }
+
 function renderProducts() {
   const container = document.getElementById('products-container');
   container.innerHTML = '';
@@ -278,6 +338,7 @@ function renderProducts() {
   });
   updateTotal();
 }
+
 function updateName(id, val) {
   const prod = products.find(p => p.id === id);
   if (prod) {
@@ -287,6 +348,7 @@ function updateName(id, val) {
   }
   updateTotal();
 }
+
 function toggleCat(id, cat, cid) {
   const prod = products.find(p => p.id === id);
   if (!prod) return;
@@ -306,17 +368,21 @@ function toggleCat(id, cat, cid) {
   if (countEl) countEl.textContent = count + ' ' + (count===1?'category':'categories') + ' selected';
   updateTotal();
 }
+
 function updateTotal() {
   const totalEntries = products.reduce((sum, p) => sum + p.categories.size, 0);
   const baseTotal = getBaseTotal(totalEntries);
   const discount = Math.min(discountTotal, baseTotal);
   const finalTotal = baseTotal - discount;
+
   document.getElementById('total-display').textContent = '$' + finalTotal.toLocaleString();
+
   let breakdownText = 'No entries selected yet';
   if (totalEntries === 1) breakdownText = '1 entry at $745';
   else if (totalEntries >= 2 && totalEntries <= 4) breakdownText = totalEntries + ' entries at $625 each';
   else if (totalEntries >= 5) breakdownText = totalEntries + ' entries at $575 each';
   document.getElementById('breakdown-text').textContent = breakdownText;
+
   const unitPrice = getUnitPrice(totalEntries);
   products.forEach(prod => {
     const subEl = document.getElementById('sub-' + prod.id);
@@ -324,6 +390,7 @@ function updateTotal() {
     const c = prod.categories.size;
     subEl.textContent = c === 0 ? '—' : '$' + (c === 1 && totalEntries === 1 ? 745 : c * unitPrice).toLocaleString();
   });
+
   const summarySection = document.getElementById('summary-section');
   if (totalEntries > 0) {
     summarySection.style.display = 'block';
@@ -334,6 +401,7 @@ function updateTotal() {
   } else {
     summarySection.style.display = 'none';
   }
+
   const allNamed = products.length > 0 && products.every(p => p.name.trim() !== '') && totalEntries > 0;
   const btn = document.getElementById('checkout-btn');
   btn.disabled = !allNamed;
@@ -341,49 +409,56 @@ function updateTotal() {
     ? 'Proceed to payment — $' + finalTotal.toLocaleString()
     : 'Enter a product name and select at least one category to continue';
 }
-async function checkout() {
+
+addProduct();
+  async function handleCheckout() {
   const btn = document.getElementById('checkout-btn');
-  const originalText = btn.textContent;
   btn.disabled = true;
-  btn.textContent = 'Redirecting to checkout…';
+  btn.textContent = 'Redirecting to payment...';
+
   try {
     const totalEntries = products.reduce((sum, p) => sum + p.categories.size, 0);
     const baseTotal = getBaseTotal(totalEntries);
     const discount = Math.min(discountTotal, baseTotal);
     const finalTotal = baseTotal - discount;
-    const c1 = normalizeToCanonical(document.getElementById('code1').value);
-    const c2 = secondCodeVisible ? normalizeToCanonical(document.getElementById('code2').value) : '';
-    const appliedCodes = [c1, c2].filter(c => c && CODES[c]);
-    const productsPayload = products.map(p => ({
-      name: p.name.trim(),
-      categories: Array.from(p.categories)
-    }));
-    const response = await fetch('/api/checkout', {
+
+    const appliedCodes = [];
+    const c1 = document.getElementById('code1').value.trim().toUpperCase();
+    const c2 = document.getElementById('code2') ? document.getElementById('code2').value.trim().toUpperCase() : '';
+    if (c1 && CODES[c1]) appliedCodes.push(c1);
+    if (c2 && CODES[c2]) appliedCodes.push(c2);
+
+    const payload = {
+      totalAmount: finalTotal,
+      entries: totalEntries,
+      discountApplied: discount,
+      discountCodes: appliedCodes,
+      products: products.map(p => ({
+        name: p.name,
+        categories: Array.from(p.categories)
+      }))
+    };
+
+    const res = await fetch('/api/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        totalAmount: finalTotal,
-        entries: totalEntries,
-        discountApplied: discount,
-        discountCodes: appliedCodes,
-        products: productsPayload
-      })
+      body: JSON.stringify(payload)
     });
-    if (!response.ok) {
-      const errData = await response.json().catch(() => ({}));
-      throw new Error(errData.error || `Checkout failed (${response.status})`);
-    }
-    const { url } = await response.json();
-    if (!url) throw new Error('No checkout URL returned from server');
+
+    const { url } = await res.json();
     window.location.href = url;
+
   } catch (err) {
-    console.error('Checkout error:', err);
-    alert('Sorry — checkout could not start.\n\n' + err.message);
+    const totalEntries = products.reduce((sum, p) => sum + p.categories.size, 0);
+    const baseTotal = getBaseTotal(totalEntries);
+    const discount = Math.min(discountTotal, baseTotal);
+    const finalTotal = baseTotal - discount;
+
     btn.disabled = false;
-    btn.textContent = originalText;
+    btn.textContent = 'Proceed to payment — $' + finalTotal.toLocaleString();
+    alert('Something went wrong. Please try again.');
   }
 }
-addProduct();
 </script>
 </body>
 </html>
