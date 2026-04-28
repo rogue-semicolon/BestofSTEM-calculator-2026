@@ -217,6 +217,38 @@ const CODES = {
   "FINNPARTNERS2026": { amount: 50,  isEarl: false }
 };
 
+// Strip everything that isn't a letter or digit, then uppercase.
+// Lets "Earl E. Byrd", "earl-e-byrd", "EARL E BYRD" all collapse to EARLEBYRD.
+function normalizeCode(s) {
+  return (s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+}
+
+// Accepted spellings (already normalized) → canonical CODES key.
+// Add new variants here, not in CODES.
+const CODE_ALIASES = {
+  // Earl E. Byrd early bird — people read the character name in the on-screen
+  // copy and type that, with or without the year, and sometimes "bird" for "byrd"
+  // or the literal "early bird" phrase. All accepted.
+  "EARLEBYRD":       "EARLE.BYRD2026",
+  "EARLEBYRD2026":   "EARLE.BYRD2026",
+  "EARLEBIRD":       "EARLE.BYRD2026",
+  "EARLEBIRD2026":   "EARLE.BYRD2026",
+  "EARLYBIRD":       "EARLE.BYRD2026",
+  "EARLYBIRD2026":   "EARLE.BYRD2026",
+  // Other codes — canonical normalized forms map to themselves.
+  "KEHLUV2026":      "KEHLUV2026",
+  "2026AWARDS":      "2026AWARDS",
+  "DOLS2026":        "DOLS2026",
+  "FINNPARTNERS2026":"FINNPARTNERS2026"
+};
+
+function lookupCode(rawInput) {
+  const norm = normalizeCode(rawInput);
+  if (!norm) return null;
+  const canonical = CODE_ALIASES[norm];
+  return canonical ? { canonical, ...CODES[canonical] } : null;
+}
+
 let products = [];
 let discountTotal = 0;
 let productCounter = 0;
@@ -241,10 +273,10 @@ function applyCodes() {
 
   function validateCode(code) {
     if (!code) return null;
-    const entry = CODES[code];
+    const entry = lookupCode(code);
     if (!entry) return { valid: false, code };
-    if (entry.isEarl && now > EARL_DEADLINE) return { valid: false, code, expired: true };
-    return { valid: true, code, ...entry };
+    if (entry.isEarl && now > EARL_DEADLINE) return { valid: false, code: entry.canonical, expired: true };
+    return { valid: true, code: entry.canonical, ...entry };
   }
 
   const r1 = validateCode(c1);
@@ -426,8 +458,10 @@ addProduct();
     const appliedCodes = [];
     const c1 = document.getElementById('code1').value.trim().toUpperCase();
     const c2 = document.getElementById('code2') ? document.getElementById('code2').value.trim().toUpperCase() : '';
-    if (c1 && CODES[c1]) appliedCodes.push(c1);
-    if (c2 && CODES[c2]) appliedCodes.push(c2);
+    const lookup1 = lookupCode(c1);
+    const lookup2 = lookupCode(c2);
+    if (lookup1) appliedCodes.push(lookup1.canonical);
+    if (lookup2) appliedCodes.push(lookup2.canonical);
 
     const payload = {
       totalAmount: finalTotal,
