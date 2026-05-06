@@ -29,17 +29,16 @@ After payment, applicants are redirected to the QuestionPro application form wit
 
 | Code | Discount | Notes |
 |------|----------|-------|
-| `EARLE.BYRD2026` | $100 off total | Expires May 5, 2026. Can be combined with ONE other code. |
-| `KEHLUV2026` | $100 off total | Cannot be combined with another standard code. |
-| `2026AWARDS` | $50 off total | Cannot be combined with another standard code. |
+| `KEHLUV2026` | $100 off total | Cannot be combined with another code. |
+| `2026AWARDS` | $50 off total | Cannot be combined with another code. |
+| `DOLS2026` | $50 off total | Cannot be combined with another code. |
+| `FINNPARTNERS2026` | $50 off total | Cannot be combined with another code. |
 
 Combination rules enforced in the UI:
-- Earl E. Byrd + one standard code = allowed
-- Two standard codes (no Earl E. Byrd) = blocked
-- Two Earl E. Byrd codes = blocked
-- Earl E. Byrd submitted after May 5, 2026 = blocked with expiry message
+- Only one discount code can be applied per checkout.
+- The Earl E. Byrd early bird code (`EARLE.BYRD2026`) expired May 5, 2026 and has been removed.
 
-To update codes, find `const CODES` in `index.html` and edit the values.
+To update codes, find `const CODES` in **both** `index.html` and `api/checkout.js` and edit the values in sync. The backend is the source of truth — the frontend is for UX only.
 
 ---
 

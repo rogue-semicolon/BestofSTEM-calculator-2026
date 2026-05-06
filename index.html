@@ -114,10 +114,10 @@ body { font-family: 'Montserrat', sans-serif; background: var(--bg-secondary); c
 
   <div class="discount-section">
     <span class="section-label">Discount or promo code</span>
-    <div class="discount-hint">Have the <strong>Earl E. Byrd early bird code?</strong> It can be combined with one additional code. <span class="deadline-badge">Expires May 5, 2026</span></div>
+    <div class="discount-hint">Enter your discount or promo code below.</div>
     <div class="discount-rows">
       <div class="discount-row">
-        <input type="text" id="code1" placeholder="First code" oninput="this.value=this.value.toUpperCase()">
+        <input type="text" id="code1" placeholder="Enter code" oninput="this.value=this.value.toUpperCase()">
         <button class="apply-btn" onclick="applyCodes()">Apply</button>
       </div>
       <div class="discount-row" id="code2-row" style="display:none;">
@@ -206,11 +206,12 @@ const CATEGORIES = {
   ]
 };
 
-const EARL_CODE = "EARLE.BYRD2026";
+// Earl E. Byrd early bird code expired May 5, 2026 and has been removed.
+// The expiration date check below is retained as defense-in-depth in case
+// any legacy isEarl entry is ever reintroduced.
 const EARL_DEADLINE = new Date("2026-05-05T23:59:59");
 
 const CODES = {
-  "EARLE.BYRD2026":   { amount: 100, isEarl: true },
   "KEHLUV2026":       { amount: 100, isEarl: false },
   "2026AWARDS":       { amount: 50,  isEarl: false },
   "DOLS2026":         { amount: 50,  isEarl: false },
@@ -218,7 +219,7 @@ const CODES = {
 };
 
 // Strip everything that isn't a letter or digit, then uppercase.
-// Lets "Earl E. Byrd", "earl-e-byrd", "EARL E BYRD" all collapse to EARLEBYRD.
+// Lets "kehluv 2026", "KEHLUV-2026", "Kehluv2026" all collapse to KEHLUV2026.
 function normalizeCode(s) {
   return (s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
 }
@@ -226,16 +227,6 @@ function normalizeCode(s) {
 // Accepted spellings (already normalized) → canonical CODES key.
 // Add new variants here, not in CODES.
 const CODE_ALIASES = {
-  // Earl E. Byrd early bird — people read the character name in the on-screen
-  // copy and type that, with or without the year, and sometimes "bird" for "byrd"
-  // or the literal "early bird" phrase. All accepted.
-  "EARLEBYRD":       "EARLE.BYRD2026",
-  "EARLEBYRD2026":   "EARLE.BYRD2026",
-  "EARLEBIRD":       "EARLE.BYRD2026",
-  "EARLEBIRD2026":   "EARLE.BYRD2026",
-  "EARLYBIRD":       "EARLE.BYRD2026",
-  "EARLYBIRD2026":   "EARLE.BYRD2026",
-  // Other codes — canonical normalized forms map to themselves.
   "KEHLUV2026":      "KEHLUV2026",
   "2026AWARDS":      "2026AWARDS",
   "DOLS2026":        "DOLS2026",
@@ -268,8 +259,6 @@ function applyCodes() {
 
   discountTotal = 0;
   let messages = [];
-  let hasEarl = false;
-  let validCodes = [];
 
   function validateCode(code) {
     if (!code) return null;
@@ -284,20 +273,17 @@ function applyCodes() {
 
   if (c1 && !r1) { msg.className = 'discount-msg error'; msg.textContent = `Code "${c1}" not recognized.`; updateTotal(); return; }
   if (c1 && r1 && !r1.valid) {
-    if (r1.expired) { msg.className = 'discount-msg error'; msg.textContent = `The Earl E. Byrd code expired May 5, 2026.`; updateTotal(); return; }
+    if (r1.expired) { msg.className = 'discount-msg error'; msg.textContent = `That code has expired.`; updateTotal(); return; }
     msg.className = 'discount-msg error'; msg.textContent = `Code "${c1}" not recognized.`; updateTotal(); return;
   }
   if (c2 && !r2) { msg.className = 'discount-msg error'; msg.textContent = `Code "${c2}" not recognized.`; updateTotal(); return; }
   if (c2 && r2 && !r2.valid) {
-    if (r2.expired) { msg.className = 'discount-msg error'; msg.textContent = `The Earl E. Byrd code expired May 5, 2026.`; updateTotal(); return; }
+    if (r2.expired) { msg.className = 'discount-msg error'; msg.textContent = `That code has expired.`; updateTotal(); return; }
     msg.className = 'discount-msg error'; msg.textContent = `Code "${c2}" not recognized.`; updateTotal(); return;
   }
 
-  const bothEarl = (r1 && r1.isEarl) && (r2 && r2.isEarl);
-  if (bothEarl) { msg.className = 'discount-msg error'; msg.textContent = `You can't combine two Earl E. Byrd codes.`; updateTotal(); return; }
-
-  const neitherEarl = r1 && r2 && !r1.isEarl && !r2.isEarl;
-  if (neitherEarl) { msg.className = 'discount-msg error'; msg.textContent = `Two standard codes can't be combined. The Earl E. Byrd code can be paired with one other code.`; updateTotal(); return; }
+  // With the early bird code retired, two codes can no longer be combined.
+  if (r1 && r2) { msg.className = 'discount-msg error'; msg.textContent = `Only one discount code can be applied.`; updateTotal(); return; }
 
   if (r1) { discountTotal += r1.amount; messages.push(`${r1.code}: -$${r1.amount}`); }
   if (r2) { discountTotal += r2.amount; messages.push(`${r2.code}: -$${r2.amount}`); }

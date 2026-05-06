@@ -1,24 +1,28 @@
 const Stripe = require('stripe');
 
 // ---- Pricing & discount rules (source of truth) ----
+// Earl E. Byrd early bird code expired May 5, 2026 and has been removed.
+// EARL_DEADLINE and the isEarl flag are retained as defense-in-depth in case
+// any legacy isEarl entry is ever reintroduced.
 const EARL_DEADLINE = new Date('2026-05-05T23:59:59');
 
 const CODES = {
-  'EARLE.BYRD2026': { amount: 100, isEarl: true },
-  'KEHLUV2026':     { amount: 100, isEarl: false },
-  '2026AWARDS':     { amount: 50,  isEarl: false },
-  'DOLS2026':       { amount: 50,  isEarl: false }
+  'KEHLUV2026':       { amount: 100, isEarl: false },
+  '2026AWARDS':       { amount: 50,  isEarl: false },
+  'DOLS2026':         { amount: 50,  isEarl: false },
+  'FINNPARTNERS2026': { amount: 50,  isEarl: false }
 };
 
 function normalizeCode(raw) {
   if (!raw || typeof raw !== 'string') return '';
   const trimmed = raw.trim();
   if (!trimmed) return '';
-  // Exact match path (period preserved). Lets "EARL E. BYRD 2026" match "EARLE.BYRD2026".
+  // Exact match path (punctuation preserved). E.g. "Kehluv 2026" → "KEHLUV2026".
   const upperNoSpaces = trimmed.replace(/\s+/g, '').toUpperCase();
   if (CODES[upperNoSpaces]) return upperNoSpaces;
   // Forgiving path: strip all non-alphanumerics and compare.
-  // Also accepts the Earl code without the trailing "2026" ("Earl E. Byrd" is how people say it).
+  // Also accepts an isEarl code without the trailing "2026" — retained for
+  // any future early-bird code that might use the same flag.
   const stripped = trimmed.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
   if (!stripped) return '';
   for (const key of Object.keys(CODES)) {
@@ -66,20 +70,11 @@ function computeDiscount(rawCodes, now = new Date()) {
     return { discount: validated[0].amount, appliedCodes: [validated[0].code] };
   }
 
-  // Two+ codes — enforce combo rules.
-  const earlCount = validated.filter(v => v.isEarl).length;
-
-  // Anything other than exactly one Earl + one standard: fall back to best single code.
-  if (earlCount !== 1 || validated.length !== 2) {
-    const best = validated.reduce((a, b) => (a.amount >= b.amount ? a : b));
-    return { discount: best.amount, appliedCodes: [best.code] };
-  }
-
-  // Exactly one Earl + one standard — allowed.
-  return {
-    discount: validated.reduce((sum, v) => sum + v.amount, 0),
-    appliedCodes: validated.map(v => v.code)
-  };
+  // With the early bird code retired, two codes can no longer be combined.
+  // Fall back to the best single code so the customer still gets a discount
+  // rather than nothing.
+  const best = validated.reduce((a, b) => (a.amount >= b.amount ? a : b));
+  return { discount: best.amount, appliedCodes: [best.code] };
 }
 
 // Stripe metadata values are capped at 500 chars. Keep the shape
